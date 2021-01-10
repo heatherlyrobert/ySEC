@@ -1,347 +1,193 @@
-." heatherly hand crafted (like a dope)
-."
-." sections, break up the document into pieces
-."   .SH <str>   begin a new section
-."   .SS <str>   begin a new sub-section
-."
-." paragraphs, if not special formatting is used, these are unnecessary
-."   .PP         before a set of contiguous lines will run them together into
-."               a single paragraph -- helps if macros separate by accident
-."   .RS <n>     start a paragraph indented by <n> characters (i use 3 mostly)
-."   .RE         end that relative paragraph
-."   .IP <str>   uses <str> as an outdent and the next line is indented
-."   .TP         tag paragraph which has a more controllable outdent than .IP
-."   .HP         start hanging paragraph where all following lines are indented
-."
-."
-."
-."
-."
-
-
-.TH yLOG 3 2008-Jul "linux" "heatherly custom tools manual"
-
+.TH ySEC 3 2020-jan "linux" "heatherly custom tools manual"
 
 .SH NAME
-.BI yLOG
-\- simple, direct, consistent, and clean process execution logging
+.B ySEC
+\- simple, clean, and clear security logging
+
+.SH PATRON
+.B aeolus-hippotades
+(keeper of winds) guides seasonal and storm winds
+
+.SH IMAGERY
+pios, just, and kind king of the floating sky-island of aiolia
 
 .SH SUMMARY
-.BI yLOG
-is a simple, direct, consistent, and clean shared library for 
-process execution logging to encourage program monitoring, execution flow understanding,
-defensive coding, and early issue detection in custom programs.
+ySEC is a custom shared-library providing standardized, well-tested, and
+traceable security services, such as access logging and monitoring, terminal
+access and usage, and coded login strings.
+
+.SH DOCUMENTATION FILES
+.nf
+ySEC (3)    >>>>>  interfacing applications with ySEC
+.nf
+ySEC (7)    ·····  decision rationale, objectives, and overview
 
 .SH SYNOPSIS
 .nf
-.B #include  <yLOG.h>
+.B #include  <ySEC.h>
+.sp
+===(( overall ))===============================
+.BI "char* ySEC_version       (void);"
 
-.R  ---general-------------------------------------
-.sp
-.BI "int      yLOG_begin  (cchar *" "a_program" ", cchar " "a_location" ", cchar " "a_quiet" ");"
-.BI "void     yLOG_end    (void);"
-.BI "char     yLOG_version(void);"
+===(( utmp ))==================================
+-------system---------------------
+.BI "char  ySEC_startup       (void);"
+.BI "char  ySEC_shutdown      (void);"
+-------getty----------------------
+.BI "char  ySEC_watch         (char *" "line " ");"
+.BI "char  ySEC_ignore        (char *" "line " ", int   " "pid  " ");"
+-------login----------------------
+.BI "char  ySEC_login         (char *" "line " ", char *" "user " ", int   " "pid  " ");"
+.BI "char  ySEC_failed        (char *" "line " ", char *" "user " ");"
+.BI "char  ySEC_logout        (char *" "line " ", char *" "user " ", int   " "pid  " ");"
 
-.R  ---line versions-------------------------------
-.sp
-.BI "void     yLOG_enter  (cchar *" "a_func" ");"
-.BI "void     yLOG_exit   (cchar *" "a_func" ");"
-.sp
-.BI "void     yLOG_break  (void);"
-.BI "void     yLOG_note   (cchar *" "a_info" ");"
-.BI "void     yLOG_info   (cchar *" "a_subject" ", cchar *" "a_info" ");"
-.BI "void     yLOG_delim  (cchar *" "a_subject" ", cchar *" "a_info" ");"
-.BI "void     yLOG_value  (cchar *" "a_subject" ", cint   " "a_value" ");"
-.BI "void     yLOG_llong  (cchar *" "a_subject" ", cllong " "a_value" ");"
-.BI "void     yLOG_char   (cchar *" "a_subject" ", cchar  " "a_char" ");"
-.BI "void     yLOG_point  (cchar *" "a_subject" ", cvoid *" "a_pointer" ");"
-.BI "void     yLOG_bullet (cint   " "a_num    " ", cchar *" "a_info" ");"
-.BI "void     yLOG_pair   (cint   " "a_num    " ", cint   " "a_value" ");"
+===(( coded ))=================================
+.BI "char  ySEC_challenge     (int   " "seed " ", char *" "code " ");"
+.BI "char  ySEC_response      (char *" "resp " ", char *" "phase" ", char *" "judge" ", ··· );"
 
-.R  ---compact versions----------------------------
-.sp
-.BI "void     yLOG_senter (cchar *" "a_func" ");"
-.BI "void     yLOG_sexit  (void);"
-.sp
-.BI "void     yLOG_snote  (cchar *" "a_info" ");"
-.BI "void     yLOG_sint   (cint   " "a_value" ");"
-.BI "void     yLOG_shex   (cuint  " "a_value" ");"
-.BI "void     yLOG_schar  (cchar  " "a_info" ");"
-.BI "void     yLOG_spoint (cvoid *" "a_pointer" ");"
-.BI "void     yLOG_sinfo  (cchar *" "a_subject" ", cchar *" "a_info" ");"
-.BI "void     yLOG_svalue (cchar *" "a_subject" ", cint   " "a_value" ");"
+===(( new ))===================================
+.BI "char  ySEC_request       (char  " "dev  " ", int   " "rpid " ", int   " "time " ", ··· );"
+.BI "char  ySEC_active        (int   " "rpid " ", char *" "resp " ", char  " "phase" ", ··· );"
+.BI "char  ySEC_complete      (int   " "rpid " ", char  " "good " ");"
 
-.R  ---normal warnings-----------------------------
-.sp
-.BI "void     yLOG_warn   (cchar *" "a_subject" ", cchar *" "a_issue" ");"
-.BI "void     yLOG_error  (cchar *" "a_subject" ", cchar *" "a_issue" ");"
-.BI "void     yLOG_fatal  (cchar *" "a_subject" ", cchar *" "a_issue" ");"
-
-.R  ---extended warnings---------------------------
-.sp
-.BI "void     yLOG_hintx  (cchar *" "a_file" ", cint " "a_line" ", cchar *" "a_reason" ","
-.BI "                       cchar *" "a_format" ", " "..." ");"
-.BI "void     yLOG_warnx  (cchar *" "a_file" ", cint " "a_line" ", cchar *" "a_reason" ","
-.BI "                       cchar *" "a_format" ", " "..." ");"
-.BI "void     yLOG_errorx (cchar *" "a_file" ", cint " "a_line" ", cchar *" "a_reason" ","
-.BI "                       cchar *" "a_format" ", " "..." ");"
-.BI "void     yLOG_fatalx (cchar *" "a_file" ", cint " "a_line" ", cchar *" "a_reason" ","
-.BI "                       cchar *" "a_format" ", " "..." ");"
+===(( terminal ))==============================
+.BI "char  ySEC_valid         (char *" "dev  " ");"
+.BI "char  ySEC_open          (int  *" "pid  " ", int  *" "fd   " ", char  " "std  " ", ··· );"
+.BI "char  ySEC_close         (int  *" "fd   " ");"
+.BI "char  ySEC_noecho        (int   " "fd   " ");"
+.BI "char  ySEC_clear         (int   " "fd   " ");"
 
 .sp
-Must also link to either the yLOG.so (shared) or yLOG.a (static) library
-as this is not automatic.  Add "-lyLOG" to the object linking.
+.B link with -L/usr/local/lib, and either -lySEC or -lySEC_debug
 
-.SH OVERVIEW
-the tragedy is that the art of logging and messaging seems to have died
-with the passing of the "operator" role and now is done on a prorietary basis
-using expensive commercial tools.  not good.  or, as an incoherent stream
-of one-dimensional messages.  bloody worse.
+.SH OVERALL FUNCTIONS
+library setup, wrapup, and admin functions
 
-so, yLOG provides a set of shared functions for logging program activities
-which report to a structured, searchable message file that supports tracing
-monitoring, warning, debugging, and maintenance.  it is designed to take a
-repetative, tedious, haphazard, neglected, and error-prone task and make it
-easy, systematic, shared, consistent, and maintainable.
+.B ySEC_version ()
+versioning string with version comment
+   -- takes no arguments
+   -- returns a char* ascii text string
 
-yLOG focuses on improving the self-diagnostic capabilities by...
-   - logging program start and conclusion
-   - entry and exit to all major functions
-   - indenting messages to make flow clear
-   - categorizing messages to allow quick filtering and searching
-   - showing critical informational and context messages
-   - provide a standard for warning and errors
-   - giving a true sense of durations and elapsed time
+.SH BASE FUNCTIONS
+standardizes traditional logging to UTMP, WTMP, and BTMP
 
-while this can not replace a program's own awareness, it can supplement it
-in a way that promotes fast, accurate production monitoring
+.B ySEC_startup ()
+logs system initialization and startup
+   -- returns char as success code (<0 fail, >=0 success)
 
-many existing libraries and utilities have been built by better programmers
-which are likely superior in speed, size, capability, and reliability; BUT,
-i would not have learned nearly as much using them, so i follow the adage...
+.B ySEC_shutdown ()
+logs system wrapup and shutdown
+   -- returns char as success code (<0 fail, >=0 success)
 
-TO TRULY LEARN> do not seek to follow in the footsteps of the men of old;
-seek what they sought ~ Matsuo Basho
+.B ySEC_watch ()
+logs startup of getty on a terminal
+   1) char *line , particular terminal to watch
+   -- returns char as success code (<0 fail, >=0 success)
 
-.SH DESCRIPTION
-yLOG consists of
-.BI 31
-total functions separated into five categories --
-.BI 3
-general,
-.BI 12
-line oriented logging,
-.BI 9
-compact logging,
-.BI 3
-normal warning, and
-.BI 4
-extended warning functions.
+.B ySEC_ignore ()
+logs shutdown of getty on a terminal
+   1) char *line , particular terminal to watch
+   2) int   pid  , process id that used getty
+   -- returns char as success code (<0 fail, >=0 success)
 
+.B ySEC_login ()
+logs successful access of the system
+   1) char *line , particular terminal
+   2) char *user , login user
+   3) int   pid  , process id created
+   -- returns char as success code (<0 fail, >=0 success)
 
-.B GENERAL ---------------------------------------------------------
-.sp
-.B yLOG_begin,
-in order to prepare the logger for use, this function passes a couple of
-vital pieces of information.  The first is the program name to name the
-output file.  The second is the output location which is
-yLOG_SYSTEM (/var/log/yLOG), yLOG_PERSONAL (~/l_hlisda), or yLOG_STDOUT.
-And the third is yLOG_NOISE (full output) or yLOG_QUIET (no output).
-.sp
-.B yLOG_end,
-stops the logger and frees up the resources.  Any calls to the logger after
-this may result in an error.
-.sp
-.B yLOG_ver,
-produces a formatted string of the number and description for the current 
-version of the yLOG library.  This is useful for debugging and is often
-saved to the log itself.
+.B ySEC_failed ()
+logs unsuccessful access of the system
+   1) char *line , particular terminal
+   2) char *user , login user
+   -- returns char as success code (<0 fail, >=0 success)
 
+.B ySEC_logout ()
+logs completion of access of the system
+   1) char *line , particular terminal
+   2) char *user , login user
+   3) int   pid  , process id used
+   -- returns char as success code (<0 fail, >=0 success)
 
-.B LINE ORIENTED ---------------------------------------------------
-.sp
-these functions all produce a single line of output each, indented to
-represent the processing depth.  the next two, yLOG_enter and yLOG_exit,
-are the only two that change the indentation level.
-.sp
-.B yLOG_enter,
-for each entry into a notable routine, the program should call this function
-with the compilier constant
-.BI __FUNCTION__
-as the parameter to avoid any and all hard coding.
-.sp
-.B yLOG_exit,
-for each exit from a notable routine, the program should call this function
-with the compilier constant
-.BI __FUNCTION__
-as the parameter to avoid any and all hard coding.  since the logger uses
-indentation, yLOG_enter and yLOG_exit should always be paired.
-.sp
-the next ten functions are used to present various date scenarious and types.
-each of them acts on the following data elements: a_subject is a 1-10 character
-short title, a_info is a character string, a_value is a numeric, and a_num
-is also a numeric used as a title.
-.sp
-.B yLOG_break,
-presents a dividing line in the output usually to show major transitions in
-the program or to break up other messages.
-.sp
-.B yLOG_note,
-presents a text string on the line, usually to show minor transitions in
-the program or to break up other messages.
-.sp
-.B yLOG_info,
-presents a short title/subject followed by a string with the actual
-information.
-.sp
-.B yLOG_delim,
-presents a short title/subject followed by a string with the actual
-information which is delimited to show length clearly.
-.sp
-.B yLOG_value,
-presents a short title/subject followed by an integer presenting a variable
-or state.
-.sp
-.B yLOG_llong,
-presents a short title/subject followed by a long long integer presenting
-a variable or state.
-.sp
-.B yLOG_char,
-presents a short title/subject followed by a character value presenting
-a variable or state.
-.sp
-.B yLOG_point,
-presents a short title/subject followed by a pointer value presenting
-a variable or memory location.
-.sp
-.B yLOG_bullet,
-presents a sequence number followed by an integer value presenting
-a variable or state.
-.sp
-.B yLOG_pair,
-presents an integer number followed by another integer value presenting
-two related values at once.
+.SH CODED FUNCTIONS
+centralizes support of coded security strings
 
+.B ySEC_challenge ()
+creates a encoded security challenge string
+   1) int   seed , seed for generation, or NULL
+   2) char *text , returns security challeng string
+   -- returns char as success code (<0 fail, >=0 success)
 
-.B COMPACT ---------------------------------------------------------
-.sp
-these functions work together to produce a single line of in total, indented to
-represent quick, but complex actions.
-.sp
-.B yLOG_senter,
-for each entry into a notable routine, the program should call this function
-with the compilier constant
-.BI __FUNCTION__
-as the parameter to avoid any and all hard coding.
-.sp
-.B yLOG_sexit,
-for each exit from a notable routine, the program should call this function
-with no parameter.
-.BI __FUNCTION__
-as the parameter to avoid any and all hard coding.  since the logger uses
-a single line, yLOG_senter and yLOG_sexit should always be paired.
-.sp
-the next ten functions are used to present various date scenarious and types.
-each of them acts on the following data elements: a_subject is a 1-10 character
-short title, a_info is a character string, a_value is a numeric, and a_num
-is also a numeric used as a title.
-.sp
-.B yLOG_note,
-presents a string in the line, usually to show actions.
-.sp
-.B yLOG_sint,
-presents an integer in the line, usually to show value.
-.sp
-.B yLOG_shex,
-presents a hex integer in the line, usually to show value.
-.sp
-.B yLOG_schar,
-presents a char in the line, usually to show state.
-.sp
-.B yLOG_spoint,
-presents a pointer in the line, usually to show location.
-.sp
-.B yLOG_sinfo,
-presents a subject/string pair when lable is important.
-.sp
-.B yLOG_svalue,
-presents a subject/integer pair when lable is important.
+.B ySEC_response ()
+interpretes a security challenge response
+   1) char *text , response to challenge
+   2) char *phase, returns phase of interpretation
+   3) char *judge, returns success/failure judgement
+   4) char *pos  , returns current/failure position in challenge
+   5) char *user , returns user entered in challenge
+   -- returns char as success code (<0 fail, >=0 success)
 
+.SH NEW FUNCTIONS
+brings a new logging compatable with hestia (my getty daemon).
 
-.B NORMAL WARNINGS -------------------------------------------------
-.sp
-these functions produce a line oriented warning message that works just like
-the yLOG_info function but is categorized differently.
-.sp
-.B yLOG_warn,
-presents a short title/subject followed by a string with the actual
-convern, shown as a [w] instead of [i].
-.sp
-.B yLOG_error,
-presents a short title/subject followed by a string with the actual
-convern, shown as a [e] instead of [i].
-.sp
-.B yLOG_fatal,
-presents a short title/subject followed by a string with the actual
-convern, shown as a [g] instead of [i].
+.B ySEC_request ()
+logs the challenge request for a getty
+   1) char *dev  , terminal device used
+   2) int   rpid , process id used
+   3) int   time , time-out in 0.1s intervals
+   4) int   lock , lock-out in 0.1s intervals
+   5) char  hint , hints shown (y/n)
+   6) char *test , challenge string used
+   -- returns char as success code (<0 fail, >=0 success)
 
+.B ySEC_active ()
+logs successful competion of challenge/response
+   1) int   rpid , process id used
+   2) char *resp , challenge response string used
+   3) char  phase, final phase of interpretation
+   4) char  judge, final judgement
+   5) char  stat , final status
+   6) char  res  , final result
+   7) char *user , user logged in
+   -- returns char as success code (<0 fail, >=0 success)
 
-.B EXTENDED WARNINGS -----------------------------------------------
-.sp
-these functions produce a line oriented warning message that works just like
-the yLOG_info function but is categorized differently.  But, they also
-generate compilier style warnings to the screen.
+.B ySEC_complete ()
+logs successful competion of session
+   1) int   rpid , process id used
+   2) char  good , full record (y/n)
 
-they're parameters are all the same.  The first is a string of the source file
-name originating the error, usually done with the
-.BI __FILE__
-compilier constant.
-The second is the line number in the source file, , usually done with the
-.BI __LINE__
-compilier constant.  And, the third is a string of 1-12 characters
-that gives a general reason for the error.
+.SH TERMINAL FUNCTIONS
+standardizes gross handling of unix/linux terminals.  this is a very small
+set of functions that can be broken out into a separate library at any time.
 
-The remaining parameters are used exactly as printf would be formatted so that
-temporary string storage is not required.  Essentially, that means a format
-string and a list of arguments.
-.sp
-.B yLOG_warnx,
-presents a short title/subject followed by a string with the actual
-convern, shown as a [w] instead of [i].  Plus this produces a standard
-screen message.
-.sp
-.B yLOG_errorx,
-presents a short title/subject followed by a string with the actual
-convern, shown as a [e] instead of [i].  Plus this produces a standard
-screen message.
-.sp
-.B yLOG_fatalx,
-presents a short title/subject followed by a string with the actual
-convern, shown as a [g] instead of [i].  Plus this produces a standard
-screen message.
+.B ySEC_valid ()
+checks validity of a terminal device
+   1) char *dev  , name of file
+   -- returns char as success code (<0 fail, >=0 success)
 
+.B ySEC_open ()
+prepares a terminal device for use
+   1) char *dev  , name of file
+   2) int  *fd   , returns file number of open device
+   3) char  std  , hangling of stdin, stdout, stderr (see stds/std)
+   4) char  keep , leave open or close after openning  (see stds/keep)
+   -- returns char as success code (<0 fail, >=0 success)
 
-.SH FILES
+.B ySEC_close ()
+discontinues use of a terminal device
+   1) int  *fd   , file number of open device (returns grounded)
+   -- returns char as success code (<0 fail, >=0 success)
 
-yLOG uses three locations for storing output depending on the setting used
-when yLOG_begin is called.
+.B ySEC_noecho ()
+turns off key echo
+   1) int   fd   , file number of open device
+   -- returns char as success code (<0 fail, >=0 success)
 
-.BI /var/log/yLOG/,
-is used when YLOG_SYSTEM is passed
-
-.BI ~/l_hlisda/,
-is used when YLOG_PERSONAL is passed
-
-.BI stdout,
-is used when YLOG_STDOUT is passed
-
-yLOG has no input or configuration files.
-
-.SH BUGS
-presently clean, but who knows till it rears its ugly head
-
-.SH AUTHOR
-the_heatherlys
+.B ySEC_clear ()
+clears the terminal screen
+   1) int   fd   , file number of open device
+   -- returns char as success code (<0 fail, >=0 success)
 
 .SH COLOPHON
 this page is part of a documentation package meant to make our use of the
