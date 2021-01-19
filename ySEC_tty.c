@@ -142,7 +142,7 @@ ysec__standard     (int a_fd)
 }
 
 char
-ySEC_noecho        (int a_fd)
+ysec__noecho       (int a_fd)
 {
    /*---(locals)-----------+-----+-----+-*/
    char        rce         =  -10;
@@ -171,7 +171,15 @@ ySEC_noecho        (int a_fd)
 }
 
 char
-ySEC_open          (char *a_dev, int *a_fd, char a_std, char a_keep)
+ySEC_clear          (int a_fd)
+{
+   tcflush (a_fd, TCIFLUSH);
+   printf  ("\033c");
+   return 0;
+}
+
+char
+ySEC_open          (char *a_dev, int *a_fd, char a_std, char a_echo, char a_keep)
 {
    /*---(locals)-----------+-----+-----+-*/
    char        rce         =  -10;
@@ -248,6 +256,17 @@ ySEC_open          (char *a_dev, int *a_fd, char a_std, char a_keep)
       dup2 (x_fd, 1);
       break;
    }
+   /*---(check on echo)------------------*/
+   if (a_echo == YEXEC_YES) {
+      rc = ysec__noecho (x_fd);
+      DEBUG_YEXEC  yLOG_value   ("echo"      , rc);
+      --rce;  if (rc < 0) {
+         DEBUG_YEXEC  yLOG_exitr   (__FUNCTION__, rce);
+         return rce;
+      }
+   }
+   /*---(clear)--------------------------*/
+   ySEC_clear (x_fd);
    /*---(close term)---------------------*/
    if (a_keep != YEXEC_YES) {
       rc = ySEC_close (&x_fd);
@@ -301,14 +320,6 @@ ySEC_close         (int *a_fd)
    *a_fd = -1;
    /*---(complete)-----------------------*/
    DEBUG_YEXEC  yLOG_exit    (__FUNCTION__);
-   return 0;
-}
-
-char
-ySEC_clear          (int a_fd)
-{
-   tcflush (a_fd, TCIFLUSH);
-   printf  ("\033c");
    return 0;
 }
 

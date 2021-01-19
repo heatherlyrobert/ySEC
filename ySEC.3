@@ -1,5 +1,4 @@
-.TH ySEC 3 2020-jan "linux" "heatherly custom tools manual"
-
+.TH ySEC 3 2020-jan "linux" "heatherly custom tools manual" 
 .SH NAME
 .B ySEC
 \- simple, clean, and clear security logging
@@ -43,7 +42,8 @@ ySEC (7)    ·····  decision rationale, objectives, and overview
 
 ===(( coded ))=================================
 .BI "char  ySEC_challenge     (int   " "seed " ", char *" "code " ");"
-.BI "char  ySEC_response      (char *" "resp " ", char *" "phase" ", char *" "judge" ", ··· );"
+.BI "char  ySEC_response      (char *" "resp " ", char *" "user " ");"
+.BI "char  ySEC_full          (char *" "resp " ", char *" "phase" ", char *" "judge" ", ··· );"
 
 ===(( new ))===================================
 .BI "char  ySEC_request       (char  " "dev  " ", int   " "rpid " ", int   " "time " ", ··· );"
@@ -53,9 +53,8 @@ ySEC (7)    ·····  decision rationale, objectives, and overview
 ===(( terminal ))==============================
 .BI "char  ySEC_valid         (char *" "dev  " ");"
 .BI "char  ySEC_open          (int  *" "pid  " ", int  *" "fd   " ", char  " "std  " ", ··· );"
-.BI "char  ySEC_close         (int  *" "fd   " ");"
-.BI "char  ySEC_noecho        (int   " "fd   " ");"
 .BI "char  ySEC_clear         (int   " "fd   " ");"
+.BI "char  ySEC_close         (int  *" "fd   " ");"
 
 .sp
 .B link with -L/usr/local/lib, and either -lySEC or -lySEC_debug
@@ -111,7 +110,11 @@ logs completion of access of the system
    -- returns char as success code (<0 fail, >=0 success)
 
 .SH CODED FUNCTIONS
-centralizes support of coded security strings
+centralizes support of coded security strings.  these are experimental and
+allow encoding information in challenge/response login dialogs.  the ones in
+this library are for demo/testing only.  this concept will be used in login,
+su, sudo, ssh, and getty services.  these are not for everyday users, only
+for power users willing to trade speed/ease for another layer of security.
 
 .B ySEC_challenge ()
 creates a encoded security challenge string
@@ -120,7 +123,14 @@ creates a encoded security challenge string
    -- returns char as success code (<0 fail, >=0 success)
 
 .B ySEC_response ()
-interpretes a security challenge response
+interpretes a security challenge response, opaque
+   1) char *text , response to challenge
+   2) char *user , returns user entered in challenge
+   -- returns char as success code (-1 fail/partial, 0 success)
+   ** intentionally difficult to see feedback for hacking
+
+.B ySEC_full ()
+interpretes a security challenge response, feedback
    1) char *text , response to challenge
    2) char *phase, returns phase of interpretation
    3) char *judge, returns success/failure judgement
@@ -171,22 +181,18 @@ prepares a terminal device for use
    1) char *dev  , name of file
    2) int  *fd   , returns file number of open device
    3) char  std  , hangling of stdin, stdout, stderr (see stds/std)
-   4) char  keep , leave open or close after openning  (see stds/keep)
-   -- returns char as success code (<0 fail, >=0 success)
-
-.B ySEC_close ()
-discontinues use of a terminal device
-   1) int  *fd   , file number of open device (returns grounded)
-   -- returns char as success code (<0 fail, >=0 success)
-
-.B ySEC_noecho ()
-turns off key echo
-   1) int   fd   , file number of open device
+   4) char  echo , auto-display typed characters
+   5) char  keep , leave open or close after openning  (see stds/keep)
    -- returns char as success code (<0 fail, >=0 success)
 
 .B ySEC_clear ()
 clears the terminal screen
    1) int   fd   , file number of open device
+   -- returns char as success code (<0 fail, >=0 success)
+
+.B ySEC_close ()
+discontinues use of a terminal device
+   1) int  *fd   , file number of open device (returns grounded)
    -- returns char as success code (<0 fail, >=0 success)
 
 .SH COLOPHON

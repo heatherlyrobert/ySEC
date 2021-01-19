@@ -5,6 +5,7 @@
 
 static char s [LEN_HUND] = "";
 static char s_type       = '4';
+static char r [LEN_HUND] = "";
 
 /*  123456789-123456789-123456789-123456789-123456789-123456789-123456789- */
 /*> k!'++a'+'a12'b63'c78'd44'e23'aAzJkCa'123'454'454'454'454'++z'+';L                 <*/
@@ -84,7 +85,7 @@ ysec__challenge_65byte   (int a_seed, char *a_challenge)
    /*---(left)---------------------------*/
    for (i =  9; i <= 28; ++i)      s [i] = LTRS_NUMBER [rand () % strlen (LTRS_NUMBER)];
    for (i = 12; i <= 28; i += 4)   s [i] = '\'';
-   for (i =  9; i <= 28; i += 4)   s [i] = LTRS_GREEK  [rand () % strlen (LTRS_GREEK )];
+   for (i =  9; i <= 28; i += 4)   s [i] = LTRS_UPLOW  [rand () % strlen (LTRS_UPLOW )];
    /*---(center)-------------------------*/
    for (i = 29; i <= 35; ++i)      s [i] = x_fill      [rand () % strlen (x_fill     )];
    a = (rand () %  4) + ((rand () % 2) ? 'a' : 'A');
@@ -99,8 +100,9 @@ ysec__challenge_65byte   (int a_seed, char *a_challenge)
    s [63] = LTRS_BPUNC [rand () % strlen (LTRS_BPUNC)];
    s [64] = LTRS_UPLOW [rand () % strlen (LTRS_UPLOW)];
    /*---(subtle change)------------------*/
-   s [ 5] = LTRS_GREEK [rand () % strlen (LTRS_GREEK )];
-   s [59] = LTRS_GREEK [rand () % strlen (LTRS_GREEK )];
+   s [ 5] = LTRS_UPLOW [rand () % strlen (LTRS_UPLOW )];
+   s [59] = LTRS_UPLOW [rand () % strlen (LTRS_UPLOW )];
+   s [32] = LTRS_FILES [rand () % 64];
    /*---(saveback)-----------------------*/
    if (a_challenge != NULL)  strlcpy (a_challenge, s, LEN_LONG);
    s_type = '6';
@@ -111,7 +113,7 @@ ysec__challenge_65byte   (int a_seed, char *a_challenge)
 char*
 ySEC_challenge          (char *a_challenge)
 {
-   return ysec__challenge_65byte (time (NULL), a_challenge);
+   return ysec__challenge_42byte (time (NULL), a_challenge);
 }
 
 /*> e9e08c5188191113828320077bf41a3cfbed2fbe  /usr/local/include/ySEC.h               <* 
@@ -125,50 +127,80 @@ ySEC_challenge          (char *a_challenge)
 /*> '++'23bermem/8testing/454¥                                    <*/
 
 static char s_phase      = '-';
-static char s_judgement  = '-';
+static char s_judge      = '-';
 static char s_rot        =   0;
 static char s_off        =   0;
 static char s_pos        =   0;
 static char s_rce        = -10;
+static char s_user       [LEN_LABEL] = "";
 
-/*> #define  FAILURE    { s_judgement = 'F';  if (a_phase != NULL)  *a_phase = s_phase;  if (a_judgement != NULL)  *a_judgement = s_judgement;  if (a_position != NULL)  *a_position = s_pos - 1;  return s_rce; }   <*/
-#define  FAILURE    { s_judgement = 'F';  return s_rce; }
-/*> #define  PARTIAL    {                     if (a_phase != NULL)  *a_phase = s_phase;  if (a_judgement != NULL)  *a_judgement = s_judgement;  if (a_position != NULL)  *a_position = s_pos - 1;  return s_rce; }   <*/
+/*> #define  FAILURE    { s_judge = 'F';  if (a_phase != NULL)  *a_phase = s_phase;  if (a_judge != NULL)  *a_judge = s_judge;  if (a_pos != NULL)  *a_pos = s_pos - 1;  return s_rce; }   <*/
+#define  FAILURE    { s_judge = 'F';  return s_rce; }
+/*> #define  PARTIAL    {                     if (a_phase != NULL)  *a_phase = s_phase;  if (a_judge != NULL)  *a_judge = s_judge;  if (a_pos != NULL)  *a_pos = s_pos - 1;  return s_rce; }   <*/
 #define  PARTIAL    return s_rce;
-#define  UPDATE     if (a_phase != NULL)  *a_phase = s_phase;  if (a_judgement != NULL)  *a_judgement = s_judgement;  if (a_position != NULL)  *a_position = s_pos - 1;
+#define  UPDATE     if (a_phase != NULL)  *a_phase = s_phase;  if (a_judge != NULL)  *a_judge = s_judge;  if (a_pos != NULL)  *a_pos = s_pos - 1;
 
 char
-ysec__prepare           (char *a_response, char *a_phase, char *a_judgement, char *a_position, char *a_user)
+ysec__prepare           (char *a_response, char *a_phase, char *a_judge, char *a_pos, char *a_user)
 {
    /*---(default save backs)-------------*/
-   if (a_phase     != NULL)  *a_phase     = '-';
-   if (a_judgement != NULL)  *a_judgement = '-';
-   if (a_position  != NULL)  *a_position  = 0;
-   if (a_user      != NULL)  strlcpy (a_user, "", LEN_LABEL);
+   if (a_phase != NULL)  *a_phase = '-';
+   if (a_judge != NULL)  *a_judge = '-';
+   if (a_pos   != NULL)  *a_pos   = 0;
+   if (a_user  != NULL)  strlcpy (a_user, "", LEN_LABEL);
    /*---(initialize globals)-------------*/
-   s_phase     = '-';
-   s_judgement = 'i';
-   s_rot       =   0;
-   s_off       =   0;
-   s_pos       =   0;
-   s_rce       = -10;
+   s_phase = '-';
+   s_judge = 'i';
+   s_rot   =   0;
+   s_off   =   0;
+   s_pos   =   0;
+   s_rce   = -10;
+   strlcpy (s_user, "", LEN_LABEL);
    /*---(defense)------------------------*/
-   --s_rce;  if (a_response  == NULL)  return s_rce;
+   --s_rce;  if (a_response  == NULL)  PARTIAL;
+   strlcpy (r, a_response, LEN_HUND);
    /*---(complete)-----------------------*/
    return 0;
 }
 
 char
-ysec__knock             (char *a_response)
+ysec__prepare_unit      (char a_test, char *a_response, char a_judge)
+{
+   /*---(locals)-----------+-----+-----+-*/
+   char        rc          =    0;
+   /*---(prepare)------------------------*/
+   rc = ysec__prepare (a_response, NULL, NULL, NULL, NULL);
+   /*---(ready test)---------------------*/
+   switch (a_test) {
+   case 'k' :  s_phase = '-'; s_pos =  0; break;
+   case 'p' :  s_phase = 'k'; s_pos =  4; break;
+   case 'u' :  s_phase = 'p'; s_pos =  6; break;
+   case 'i' :  s_phase = 'u'; s_pos = 14; break;
+   case 'c' :  s_phase = 'i'; s_pos = 15; strlcpy (s_user, "yexecer", LEN_LABEL);  break;
+   case 's' :  s_phase = 'c'; s_pos = 24; break;
+   case 'f' :  s_phase = 's'; s_pos = 27; break;
+   default  :  return -1;
+   }
+   /*---(status)-------------------------*/
+   s_judge = a_judge;
+   /*---(complete)-----------------------*/
+   return 0;
+}
+
+char
+ysec__knock             (void)
 {
    /*---(locals)-----------+-----+-----+-*/
    char        x_ticks     [LEN_LABEL] = "";
    char        a, b, c, d;
    int         l           =    0;
+   /*---(quick out)----------------------*/
+   --s_rce;  if (s_judge != 'i')  return s_rce;
+   --s_rce;  if (s_phase != '-')  return s_rce;
    /*---(update)-------------------------*/
    s_phase = 'k';
    /*---(prepare)------------------------*/
-   strlcpy (x_ticks, a_response, 5);
+   strlcpy (x_ticks, r, 5);
    l = strlen (x_ticks);
    /*---(make sure exact can not match)--*/
    strldchg (x_ticks, '+' , '-' , LEN_LABEL);
@@ -192,180 +224,298 @@ ysec__knock             (char *a_response)
    --s_rce;  ++s_pos;  if (l >= s_pos && x_ticks [s_pos - 1] != s [ c])  FAILURE;
    --s_rce;  if (l <= s_pos)   PARTIAL;
    --s_rce;  ++s_pos;  if (l >= s_pos && x_ticks [s_pos - 1] != s [ d])  FAILURE;
+   /*---(ending)-------------------------*/
+   l = strlen (r);
    --s_rce;  if (l <= s_pos)   PARTIAL;
    /*---(complete)-----------------------*/
    return 0;
 }
 
 char
-ysec__prefix            (char a_type, char *a_rce, char *a_response, char *a_phase, char *a_judgement, char *a_position)
+ysec__prefix            (void)
 {
    /*---(locals)-----------+-----+-----+-*/
-   char        rce         = *a_rce;
-   char        x_ticks     [LEN_LABEL] = "";
+   char        x_prefix    [LEN_LABEL] = "";
    char        a, b;
    int         l           =    0;
+   /*---(quick out)----------------------*/
+   --s_rce;  if (s_judge != 'i')  return s_rce;
+   --s_rce;  if (s_phase != 'k')  return s_rce;
+   l = strlen (r);
+   --s_rce;  if (l <= s_pos)   PARTIAL;
    /*---(update)-------------------------*/
    s_phase = 'p';
-   UPDATE;
    /*---(prepare)------------------------*/
-   strlcpy (x_ticks, a_response, 7);
-   l = strlen (x_ticks);
+   strlcpy (x_prefix, r, 7);
+   l = strlen (x_prefix);
    /*---(positions)----------------------*/
-   switch (a_type) {
+   switch (s_type) {
    case '4' : a =  6; b = 18;  break;
    case '6' : a = 10; b = 26;  break;
    }
    /*---(eval)---------------------------*/
-   --rce;  ++s_pos;  if (l >= s_pos && x_ticks [s_pos - 1] != s [ a])  FAILURE;
-   --rce;  if (l <= s_pos)   PARTIAL;
-   --rce;  ++s_pos;  if (l >= s_pos && x_ticks [s_pos - 1] != s [ b])  FAILURE;
-   /*---(saveback)-----------------------*/
-   *a_rce = rce;
+   --s_rce;  ++s_pos;  if (l >= s_pos && x_prefix [s_pos - 1] != s [ a])  FAILURE;
+   --s_rce;  if (l <= s_pos)   PARTIAL;
+   --s_rce;  ++s_pos;  if (l >= s_pos && x_prefix [s_pos - 1] != s [ b])  FAILURE;
+   /*---(ending)-------------------------*/
+   l = strlen (r);
+   --s_rce;  if (l <= s_pos)   PARTIAL;
    /*---(complete)-----------------------*/
    return 0;
 }
 
 char
-ysec__response_42byte   (char *a_response, char *a_phase, char *a_judgement, char *a_position, char *a_user)
+ysec__user              (void)
 {
-   char        rce         =  -10;
+   /*---(locals)-----------+-----+-----+-*/
    char        rc          =    0;
-   int         x_len       =    0;
-   char        n           =    0;
+   char        x_user      [LEN_HUND]  = "";
+   char        a           =    0;
    char        c           =    0;
    char       *p           = NULL;
-   char       *q           = NULL;
-   char       *r           = NULL;
-   char        x_pref      [LEN_LABEL] = "";
-   char        x_user      [LEN_LABEL] = "";
-   char        t           [LEN_DESC]  = "";
-   char        x_off       =    0;
-   /*---(default save backs)-------------*/
-   if (a_phase     != NULL)  *a_phase     = '-';
-   if (a_judgement != NULL)  *a_judgement = '-';
-   if (a_position  != NULL)  *a_position  = 0;
-   if (a_user      != NULL)  strlcpy (a_user, "", LEN_LABEL);
-   /*---(initialize globals)-------------*/
-   s_phase     = '-';
-   s_judgement = 'i';
-   s_rot       =   0;
-   s_off       =   0;
-   s_pos       =   0;
-   /*---(defense)------------------------*/
-   --rce;  if (a_response  == NULL)  return rce;
-   /*---(knock)--------------------------*/
-   rc = ysec__knock (a_response);
-   UPDATE;
-   if (rc < 0)  return rc;
-   /*---(preparation)--------------------*/
-   /*> strlcpy (x_pref, a_response, 7);                                               <* 
-    *> x_len = strlen (x_pref);                                                       <*/
-   /*---(make sure exact can not match)--*/
-   /*> strldchg (x_pref, '+' , '-' , LEN_LABEL);                                      <* 
-    *> strldchg (x_pref, '\'', '-' , LEN_LABEL);                                      <*/
-   /*---(transform)----------------------*/
-   /*> strldchg (x_pref, '.' , '+' , LEN_LABEL);                                      <* 
-    *> strldchg (x_pref, ' ' , '\'', LEN_LABEL);                                      <*/
-   /*---(unit testing)-------------------*/
-   /*> strldchg (x_pref, '¬' , '\'', LEN_LABEL);                                      <* 
-    *> strldchg (x_pref, '·' , '\'', LEN_LABEL);                                      <*/
-   /*---(knock)--------------------------*/
-   /*> s_phase = 'k';                                                                    <* 
-    *> UPDATE;                                                                           <* 
-    *> --rce;  ++s_pos;  if (x_len >= s_pos && x_pref [s_pos - 1] != s [ 1])  FAILURE;   <* 
-    *> --rce;  if (x_len <= s_pos)   PARTIAL;                                            <* 
-    *> --rce;  ++s_pos;  if (x_len >= s_pos && x_pref [s_pos - 1] != s [ 4])  FAILURE;   <* 
-    *> --rce;  if (x_len <= s_pos)   PARTIAL;                                            <* 
-    *> --rce;  ++s_pos;  if (x_len >= s_pos && x_pref [s_pos - 1] != s [37])  FAILURE;   <* 
-    *> --rce;  if (x_len <= s_pos)   PARTIAL;                                            <* 
-    *> --rce;  ++s_pos;  if (x_len >= s_pos && x_pref [s_pos - 1] != s [40])  FAILURE;   <* 
-    *> --rce;  if (x_len <= s_pos)   PARTIAL;                                            <*/
-   /*---(prefix)-------------------------*/
-   rc = ysec__prefix ('4', &rce, a_response, a_phase, a_judgement, a_position);
-   if (rc < 0)  return rc;
-   /*> s_phase = 'p';                                                                    <* 
-    *> UPDATE;                                                                           <* 
-    *> --rce;  ++s_pos;  if (x_len >= s_pos && x_pref [s_pos - 1] != s [ 6])  FAILURE;   <* 
-    *> --rce;  if (x_len <= s_pos)   PARTIAL;                                            <* 
-    *> --rce;  ++s_pos;  if (x_len >= s_pos && x_pref [s_pos - 1] != s [18])  FAILURE;   <*/
-   /*---(user)---------------------------*/
-   x_len = strlen (a_response);
-   --rce;  if (x_len <= s_pos)   PARTIAL;
+   int         l           =    0;
+   /*---(quick out)----------------------*/
+   --s_rce;  if (s_judge != 'i')  return s_rce;
+   --s_rce;  if (s_phase != 'p')  return s_rce;
+   l = strlen (r);
+   --s_rce;  if (l <= s_pos)   PARTIAL;
+   /*---(update)-------------------------*/
    s_phase = 'u';
-   UPDATE;
-   if      (strchr ("ABCD", s [21]) != NULL)  s_rot = s [21] - 'A' + 1;
-   else if (strchr ("abcd", s [21]) != NULL)  s_rot = s [21] - 'a' + 1;
-   else if (strchr ("ABCD", s [22]) != NULL)  s_rot = s [22] - 'A' + 1;
-   else if (strchr ("abcd", s [22]) != NULL)  s_rot = s [22] - 'a' + 1;
-   else if (strchr ("ABCD", s [23]) != NULL)  s_rot = s [23] - 'A' + 1;
-   else if (strchr ("abcd", s [23]) != NULL)  s_rot = s [23] - 'a' + 1;
-   c = strldcnt (a_response, '/', LEN_DESC);
-   --rce;  if (c < 1)        PARTIAL;
-   strlcpy (t, a_response + 6, LEN_DESC);
-   p = strtok_r (t, "/", &r);
-   UPDATE;
-   --rce;  if (p == NULL)    PARTIAL;
-   x_len = strlen (p);
-   s_pos += x_len;
-   UPDATE;
-   rc = ysec__user (p, s_rot, x_user);
-   --rce;  ++s_pos;  if (rc < 0)  FAILURE;
-   /*---(infix)--------------------------*/
-   p = strtok_r (NULL, "/", &r);
-   --rce;  if (p == NULL)    PARTIAL;
-   s_phase = 'i';
-   UPDATE;
-   x_len = strlen (p);
-   --rce;  ++s_pos;  if (x_len >= 1 && p [ 0] != s [13])  FAILURE;
-   --rce;  if (x_len <= 1)   PARTIAL;
-   /*---(password)-----------------------*/
-   s_phase = 'c';
-   UPDATE;
-   c = strldcnt (a_response, '/', LEN_DESC);
-   --rce;  if (c < 2)        PARTIAL;
-   ++p;
-   x_len = strlen (p);
-   s_pos += x_len;
-   UPDATE;
-   rc = ysec__password (x_user, p);
-   --rce;  ++s_pos;  if (rc < 0)  FAILURE;
-   x_len = strlen (a_response);
-   --rce;  if (a_response [x_len - 1] == '/')  PARTIAL;
-   /*---(suffix)-------------------------*/
-   s_phase = 's';
-   UPDATE;
-   if      (strchr ("XYZ" , s [21]) != NULL)  s_off = s [21] - 'X';
-   else if (strchr ("xyz" , s [21]) != NULL)  s_off = s [21] - 'x';
-   else if (strchr ("XYZ" , s [22]) != NULL)  s_off = s [22] - 'X';
-   else if (strchr ("xyz" , s [22]) != NULL)  s_off = s [22] - 'x';
-   else if (strchr ("XYZ" , s [23]) != NULL)  s_off = s [23] - 'X';
-   else if (strchr ("xyz" , s [23]) != NULL)  s_off = s [23] - 'x';
-   x_off = 25 + (s_off * 4);
-   /*> printf ("suffix     [%-3.3s]\n", s + x_off);                                   <*/
-   p = strtok_r (NULL, "/", &r);
-   --rce;  if (p == NULL)    PARTIAL;
-   /*> printf ("remain   %2d[%s]\n", x_len, p);                                       <*/
-   --rce;  ++s_pos;  if (x_len >= s_pos  && p [ 0] != s [x_off + 0])  FAILURE;
-   --rce;  if (x_len <= s_pos)   PARTIAL;
-   --rce;  ++s_pos;  if (x_len >= s_pos && p [ 1] != s [x_off + 1])  FAILURE;
-   --rce;  if (x_len <= s_pos)   PARTIAL;
-   --rce;  ++s_pos;  if (x_len >= s_pos && p [ 2] != s [x_off + 2])  FAILURE;
-   --rce;  if (x_len <= s_pos)   PARTIAL;
-   /*---(final)--------------------------*/
-   s_phase = 'f';
-   UPDATE;
-   --rce;  ++s_pos;  if (x_len >= s_pos && (p [ 3] != '¥' && p [ 3] != G_KEY_ESCAPE))   FAILURE;
-   s_judgement = 'Y';
-   UPDATE;
-   /*---(save back)----------------------*/
-   if (a_user != NULL)  strlcpy (a_user, x_user, LEN_LABEL);
+   /*---(figure rotation)----------------*/
+   switch (s_type) {
+   case '4' : a = 21;  break;
+   case '6' : a = 29;  break;
+   }
+   if      (strchr ("ABCD", s [a + 0]) != NULL)  s_rot = s [a + 0] - 'A' + 1;
+   else if (strchr ("abcd", s [a + 0]) != NULL)  s_rot = s [a + 0] - 'a' + 1;
+   else if (strchr ("ABCD", s [a + 1]) != NULL)  s_rot = s [a + 1] - 'A' + 1;
+   else if (strchr ("abcd", s [a + 1]) != NULL)  s_rot = s [a + 1] - 'a' + 1;
+   else if (strchr ("ABCD", s [a + 2]) != NULL)  s_rot = s [a + 2] - 'A' + 1;
+   else if (strchr ("abcd", s [a + 2]) != NULL)  s_rot = s [a + 2] - 'a' + 1;
+   /*---(find marker)--------------------*/
+   c = strldcnt (r, '/', LEN_HUND);
+   /*> printf ("%1d  %2d[%s]\n", c, strlen (r), r);                                   <*/
+   --s_rce;  if (c < 1)        PARTIAL;
+   /*---(copy user name)-----------------*/
+   strlcpy (x_user, r + 6, LEN_HUND);
+   p = strtok (x_user, "/");
+   /*> printf ("      %-10.10s  %-10p  %2d[%s]\n", x_user, p, strlen (p), p);         <*/
+   --s_rce;  if (p == NULL)    PARTIAL;
+   /*---(check name)---------------------*/
+   l = strlen (p);
+   s_pos += l;
+   rc = ysec__username (p, s_rot, s_user);
+   /*> printf ("      %1d  %2d  %2d[%s]\n", s_rot, rc, l, s_user);                    <*/
+   --s_rce;  ++s_pos;  if (rc < 0)  FAILURE;
+   /*---(ending)-------------------------*/
+   l = strlen (r);
+   --s_rce;  if (l <= s_pos)   PARTIAL;
    /*---(complete)-----------------------*/
    return 0;
 }
 
 char
-ysec__response_65byte   (char *a_response, char *a_phase, char *a_judgement, char *a_position, char *a_user)
+ysec__infix             (void)
+{
+   /*---(locals)-----------+-----+-----+-*/
+   char        rc          =    0;
+   char       *p           = NULL;
+   char        x_infix     [LEN_HUND]  = "";
+   char        a           =    0;
+   int         l           =    0;
+   /*---(quick out)----------------------*/
+   --s_rce;  if (s_judge != 'i')  return s_rce;
+   --s_rce;  if (s_phase != 'u')  return s_rce;
+   l = strlen (r);
+   --s_rce;  if (l <= s_pos)   PARTIAL;
+   /*---(update)-------------------------*/
+   s_phase = 'i';
+   /*---(prepare)------------------------*/
+   switch (s_type) {
+   case '4' : a = 13;  break;
+   case '6' : a = 19;  break;
+   }
+   /*---(parse)--------------------------*/
+   strlcpy (x_infix, r, LEN_HUND);
+   p = strtok (x_infix, "/");
+   p = strtok (NULL   , "/");
+   --s_rce;  if (p == NULL)    PARTIAL;
+   /*---(eval)---------------------------*/
+   --s_rce;  ++s_pos;  if (l >= s_pos && x_infix  [s_pos - 1] != s [ a])  FAILURE;
+   --s_rce;  if (l <= s_pos)   PARTIAL;
+   /*---(complete)-----------------------*/
+   return 0;
+}
+
+char
+ysec__pass              (void)
+{
+   /*---(locals)-----------+-----+-----+-*/
+   char        rc          =    0;
+   char       *p           = NULL;
+   char        x_pass      [LEN_HUND]  = "";
+   char        a           =    0;
+   char        c           =    0;
+   int         l           =    0;
+   /*---(quick out)----------------------*/
+   --s_rce;  if (s_judge != 'i')  return s_rce;
+   --s_rce;  if (s_phase != 'i')  return s_rce;
+   l = strlen (r);
+   --s_rce;  if (l <= s_pos)   PARTIAL;
+   /*---(update)-------------------------*/
+   s_phase = 'c';
+   /*---(find marker)--------------------*/
+   c = strldcnt (r, '/', LEN_HUND);
+   /*> printf ("%1d  %2d[%s]\n", c, strlen (r), r);                                   <*/
+   --s_rce;  if (c < 2)        PARTIAL;
+   /*---(copy pass)----------------------*/
+   strlcpy (x_pass, r, LEN_HUND);
+   p = strtok (x_pass , "/");
+   p = strtok (NULL   , "/");
+   ++p;
+   /*> printf ("      %-10p  %2d[%s]\n", p, strlen (p), p);                           <*/
+   --s_rce;  if (p == NULL)    PARTIAL;
+   /*---(check pass)---------------------*/
+   l = strlen (p);
+   s_pos += l;
+   rc = ysec__password (s_user, p);
+   /*> printf ("      %1d  %2d  %2d[%s]\n", s_rot, rc, l, s_user);                    <*/
+   --s_rce;  ++s_pos;  if (rc < 0)  FAILURE;
+   /*---(ending)-------------------------*/
+   l = strlen (r);
+   --s_rce;  if (l <= s_pos)   PARTIAL;
+   /*---(complete)-----------------------*/
+   return 0;
+}
+
+char
+ysec__suffix            (void)
+{
+   /*---(locals)-----------+-----+-----+-*/
+   char        x_suffix    [LEN_HUND]  = "";
+   char        a, b;
+   char        c           =    0;
+   char       *p           = NULL;
+   int         l           =    0;
+   /*---(quick out)----------------------*/
+   --s_rce;  if (s_judge != 'i')  return s_rce;
+   --s_rce;  if (s_phase != 'c')  return s_rce;
+   l = strlen (r);
+   --s_rce;  if (l <= s_pos)   PARTIAL;
+   /*---(update)-------------------------*/
+   s_phase = 's';
+   /*---(figure offset)------------------*/
+   switch (s_type) {
+   case '4' : a = 21;  break;
+   case '6' : a = 33;  break;
+   }
+   if      (strchr ("XYZ", s [a + 0]) != NULL)  s_off = s [a + 0] - 'X';
+   else if (strchr ("xyz", s [a + 0]) != NULL)  s_off = s [a + 0] - 'x';
+   else if (strchr ("XYZ", s [a + 1]) != NULL)  s_off = s [a + 1] - 'X';
+   else if (strchr ("xyz", s [a + 1]) != NULL)  s_off = s [a + 1] - 'x';
+   else if (strchr ("XYZ", s [a + 2]) != NULL)  s_off = s [a + 2] - 'X';
+   else if (strchr ("xyz", s [a + 2]) != NULL)  s_off = s [a + 2] - 'x';
+   b = a + ((s_off + 1) * 4);
+   /*---(find marker)--------------------*/
+   c = strldcnt (r, '/', LEN_HUND);
+   /*> printf ("%1d  %2d[%s]\n", c, strlen (r), r);                                   <*/
+   --s_rce;  if (c < 2)        PARTIAL;
+   /*> printf ("      %2do  %2da  %2db  [%-3.3s]\n", s_off, a, b, s + b);             <*/
+   /*---(copy suffix)--------------------*/
+   strlcpy (x_suffix, r, LEN_HUND);
+   p = strtok (x_suffix, "/");
+   p = strtok (NULL    , "/");
+   p = strtok (NULL    , "/");
+   /*> printf ("      %-10p  %2d[%s]\n", p, strlen (p), p);                           <*/
+   --s_rce;  if (p == NULL)    PARTIAL;
+   /*---(eval)---------------------------*/
+   --s_rce;  ++s_pos;  if (l >= s_pos && p [ 0] != s [b + 0])  FAILURE;
+   --s_rce;  if (l <= s_pos)   PARTIAL;
+   --s_rce;  ++s_pos;  if (l >= s_pos && p [ 1] != s [b + 1])  FAILURE;
+   --s_rce;  if (l <= s_pos)   PARTIAL;
+   --s_rce;  ++s_pos;  if (l >= s_pos && p [ 2] != s [b + 2])  FAILURE;
+   /*---(ending)-------------------------*/
+   l = strlen (r);
+   --s_rce;  if (l <= s_pos)   PARTIAL;
+   /*---(complete)-----------------------*/
+   return 0;
+}
+
+char
+ysec__final             (void)
+{
+   /*---(locals)-----------+-----+-----+-*/
+   char        x_suffix    [LEN_HUND]  = "";
+   char        c           =    0;
+   char       *p           = NULL;
+   int         l           =    0;
+   /*---(quick out)----------------------*/
+   --s_rce;  if (s_judge != 'i')  return s_rce;
+   --s_rce;  if (s_phase != 's')  return s_rce;
+   l = strlen (r);
+   --s_rce;  if (l <= s_pos)   PARTIAL;
+   /*---(update)-------------------------*/
+   s_phase = 'f';
+   /*---(find marker)--------------------*/
+   c = strldcnt (r, '/', LEN_HUND);
+   --s_rce;  if (c < 2)        PARTIAL;
+   /*---(copy suffix)--------------------*/
+   strlcpy (x_suffix, r, LEN_HUND);
+   p = strtok (x_suffix, "/");
+   p = strtok (NULL    , "/");
+   p = strtok (NULL    , "/");
+   --s_rce;  if (p == NULL)    PARTIAL;
+   /*---(eval)---------------------------*/
+   --s_rce;  ++s_pos;  if (l >= s_pos && (p [ 3] != '¥' && p [ 3] != G_KEY_ESCAPE))   FAILURE;
+   s_judge = 'Y';
+   /*---(complete)-----------------------*/
+   return 0;
+}
+
+char
+ysec__response_42byte   (char *a_response, char *a_phase, char *a_judge, char *a_pos, char *a_user)
+{
+   /*---(locals)-----------+-----+-----+-*/
+   char        rc          =    0;
+   /*---(prepare)------------------------*/
+   rc = ysec__prepare (a_response, a_phase, a_judge, a_pos, a_user);
+   UPDATE;
+   if (rc < 0)  return rc;
+   /*---(knock)--------------------------*/
+   rc = ysec__knock   ();
+   UPDATE;
+   if (rc < 0)  return rc;
+   /*---(prefix)-------------------------*/
+   rc = ysec__prefix  ();
+   UPDATE;
+   if (rc < 0)  return rc;
+   /*---(user)---------------------------*/
+   rc = ysec__user    ();
+   UPDATE;
+   if (rc < 0)  return rc;
+   if (a_user != NULL)  strlcpy (a_user, s_user, LEN_LABEL);
+   /*---(infix)--------------------------*/
+   rc = ysec__infix   ();
+   UPDATE;
+   if (rc < 0)  return rc;
+   /*---(password)-----------------------*/
+   rc = ysec__pass    ();
+   UPDATE;
+   if (rc < 0)  return rc;
+   /*---(suffix)-------------------------*/
+   rc = ysec__suffix  ();
+   UPDATE;
+   if (rc < 0)  return rc;
+   /*---(final)--------------------------*/
+   rc = ysec__final   ();
+   UPDATE;
+   if (rc < 0)  return rc;
+   /*---(complete)-----------------------*/
+   return 0;
+}
+
+char
+ysec__response_65byte   (char *a_response, char *a_phase, char *a_judge, char *a_pos, char *a_user)
 {
    char        rce         =  -10;
    char        rc          =    0;
@@ -380,20 +530,20 @@ ysec__response_65byte   (char *a_response, char *a_phase, char *a_judgement, cha
    char        t           [LEN_DESC]  = "";
    char        x_off       =    0;
    /*---(default save backs)-------------*/
-   if (a_phase     != NULL)  *a_phase     = '-';
-   if (a_judgement != NULL)  *a_judgement = '-';
-   if (a_position  != NULL)  *a_position  = 0;
-   if (a_user      != NULL)  strlcpy (a_user, "", LEN_LABEL);
+   if (a_phase != NULL)  *a_phase = '-';
+   if (a_judge != NULL)  *a_judge = '-';
+   if (a_pos   != NULL)  *a_pos   = 0;
+   if (a_user  != NULL)  strlcpy (a_user, "", LEN_LABEL);
    /*---(initialize globals)-------------*/
    s_phase     = '-';
-   s_judgement = 'i';
+   s_judge = 'i';
    s_rot       =   0;
    s_off       =   0;
    s_pos       =   0;
    /*---(defense)------------------------*/
    --rce;  if (a_response  == NULL)  return rce;
    /*---(knock)--------------------------*/
-   rc = ysec__knock (a_response);
+   rc = ysec__knock ();
    UPDATE;
    if (rc < 0)  return rc;
    /*---(prefix)-------------------------*/
@@ -422,7 +572,7 @@ ysec__response_65byte   (char *a_response, char *a_phase, char *a_judgement, cha
    x_len = strlen (p);
    s_pos += x_len;
    UPDATE;
-   rc = ysec__user (p, s_rot, x_user);
+   rc = ysec__username (p, s_rot, x_user);
    --rce;  ++s_pos;  if (rc < 0)  FAILURE;
    /*---(infix)--------------------------*/
    p = strtok_r (NULL, "/", &r);
@@ -469,7 +619,7 @@ ysec__response_65byte   (char *a_response, char *a_phase, char *a_judgement, cha
    s_phase = 'f';
    UPDATE;
    --rce;  ++s_pos;  if (x_len >= s_pos && (p [ 3] != '¥' && p [ 3] != G_KEY_ESCAPE))   FAILURE;
-   s_judgement = 'Y';
+   s_judge = 'Y';
    UPDATE;
    /*---(save back)----------------------*/
    if (a_user != NULL)  strlcpy (a_user, x_user, LEN_LABEL);
@@ -478,13 +628,22 @@ ysec__response_65byte   (char *a_response, char *a_phase, char *a_judgement, cha
 }
 
 char
-ySEC_response           (char *a_response, char *a_phase, char *a_judgement, char *a_position, char *a_user)
+ySEC_response           (char *a_response, char *a_user)
 {
-   return ysec__response_42byte (a_response, a_phase, a_judgement, a_position, a_user);
+   char        rc          =    0;
+   rc = ysec__response_42byte (a_response, NULL, NULL, NULL, a_user);
+   if (rc < 0)  return -1;
+   return 0;
 }
 
 char
-ysec__user              (char *a_user, char a_rotate, char *a_true)
+ySEC_full               (char *a_response, char *a_phase, char *a_judge, char *a_pos, char *a_user)
+{
+   return ysec__response_42byte (a_response, a_phase, a_judge, a_pos, a_user);
+}
+
+char
+ysec__username          (char *a_user, char a_rotate, char *a_true)
 {
    /*---(locals)-----------+-----+-----+-*/
    char        rce         =  -10;
@@ -649,7 +808,7 @@ ysec_coded__unit        (char *a_question)
    strlcpy  (unit_answer, "CODED            : question not understood", LEN_RECD);
    /*---(crontab name)-------------------*/
    if      (strcmp (a_question, "response"      )  == 0) {
-      snprintf (unit_answer, LEN_RECD, "CODED response   : phase %c, judge %c, s_rot %d, s_off %d, s_pos %2d", s_phase, s_judgement, s_rot, s_off, s_pos);
+      snprintf (unit_answer, LEN_RECD, "CODED response   : type %c, phase %c, judge %c, s_rot %d, s_off %d, s_pos %2d, s_user %2d[%s]", s_type, s_phase, s_judge, s_rot, s_off, s_pos, strlen (s_user), s_user);
    }
    /*---(complete)-----------------------*/
    return unit_answer;

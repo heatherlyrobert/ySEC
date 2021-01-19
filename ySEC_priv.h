@@ -28,8 +28,8 @@
 
 #define     P_VERMAJOR  "0.-- preproduction building and testing"
 #define     P_VERMINOR  "0.9- advancing and readying for hestia/hearth"
-#define     P_VERNUM    "0.9a"
-#define     P_VERTXT    "added 65byte challenge and generic knock testing"
+#define     P_VERNUM    "0.9b"
+#define     P_VERTXT    "moved tty from yEXEC and worked over"
 
 #define     P_PRIORITY  "direct, simple, brief, vigorous, and lucid (h.w. fowler)"
 #define     P_PRINCIPAL "[grow a set] and build your wings on the way down (r. bradbury)"
@@ -133,7 +133,7 @@ char        ysec__unit_loud         (void);
 char        ysec__unit_end          (void);
 char*       ysec_utmp__unit         (char *a_question, char w, int n);
 
-char        ysec__user              (char *a_user, char a_rotate, char *a_true);
+char        ysec__username          (char *a_user, char a_rotate, char *a_true);
 char        ysec__password          (char *a_user, char *a_pass);
 
 int         ysec__find              (char *a_type, int a_rpid, int *a_pos);
@@ -146,7 +146,14 @@ char        ysec_system             (char a_type);
 char*       ysec__challenge_42byte  (int a_seed, char *a_challenge);
 char*       ysec__challenge_65byte  (int a_seed, char *a_challenge);
 char        ysec__prepare           (char *a_response, char *a_phase, char *a_judgement, char *a_position, char *a_user);
-char        ysec__knock             (char *a_response);
+char        ysec__prepare_unit      (char a_test, char *a_response, char a_judge);
+char        ysec__knock             (void);
+char        ysec__prefix            (void);
+char        ysec__user              (void);
+char        ysec__infix             (void);
+char        ysec__pass              (void);
+char        ysec__suffix            (void);
+char        ysec__final             (void);
 char        ysec__response_42byte   (char *a_response, char *a_phase, char *a_judgement, char *a_position, char *a_user);
 char        ysec__response_65byte   (char *a_response, char *a_phase, char *a_judgement, char *a_position, char *a_user);
 

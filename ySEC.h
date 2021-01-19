@@ -130,13 +130,13 @@ char        ySEC_active             (int a_rpid, char *a_response, char a_phase,
 char        ySEC_complete           (int a_rpid, char a_good);
 /*---(codes)----------------*/
 char*       ySEC_challenge          (char *a_challenge);
-char        ySEC_response           (char *a_response, char *a_phase, char *a_judgement, char *a_position, char *a_user);
+char        ySEC_response           (char *a_response, char *a_user);
+char        ySEC_full               (char *a_response, char *a_phase, char *a_judgement, char *a_position, char *a_user);
 /*---(tty)------------------*/
 char        ySEC_valid              (char *a_dev);
-char        ySEC_open               (char *a_dev, int *a_fd, char a_std, char a_keep);
-char        ySEC_close              (int *a_fd);
-char        ySEC_noecho             (int a_fd);
+char        ySEC_open               (char *a_dev, int *a_fd, char a_std, char a_echo, char a_keep);
 char        ySEC_clear              (int a_fd);
+char        ySEC_close              (int *a_fd);
 
 
 #endif
