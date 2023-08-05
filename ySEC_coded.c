@@ -32,7 +32,7 @@ ysec__challenge_42byte   (int a_seed, char *a_challenge)
    }
    /*---(prepare)------------------------*/
    srand (a_seed);
-   sprintf (s, "%42.42s", STR_EMPTY);
+   sprintf (s, "%42.42s", YSTR_EMPTY);
    for (i =  0; i <=  5; ++i)      s [i] = t [rand () %  2];
    for (i =  6; i <= 19; ++i)      s [i] = (rand () % 10) + '0';
    for (i =  8; i <= 19; i += 3)   s [i] = '\'';
@@ -77,15 +77,15 @@ ysec__challenge_65byte   (int a_seed, char *a_challenge)
    }
    /*---(prepare)------------------------*/
    srand (a_seed);
-   sprintf (s, "%65.65s", STR_EMPTY);
+   sprintf (s, "%65.65s", YSTR_EMPTY);
    /*---(prefix/ticks)-------------------*/
-   s [ 0] = LTRS_UPLOW [rand () % strlen (LTRS_UPLOW)];
-   s [ 1] = LTRS_BPUNC [rand () % strlen (LTRS_BPUNC)];
-   for (i =  2; i <=  8; ++i)   s [i] = LTRS_TICK [rand () %  strlen (LTRS_TICK)];
+   s [ 0] = YSTR_UPLOW [rand () % strlen (YSTR_UPLOW)];
+   s [ 1] = YSTR_BPUNC [rand () % strlen (YSTR_BPUNC)];
+   for (i =  2; i <=  8; ++i)   s [i] = YSTR_TICK [rand () %  strlen (YSTR_TICK)];
    /*---(left)---------------------------*/
-   for (i =  9; i <= 28; ++i)      s [i] = LTRS_NUMBER [rand () % strlen (LTRS_NUMBER)];
+   for (i =  9; i <= 28; ++i)      s [i] = YSTR_NUMBER [rand () % strlen (YSTR_NUMBER)];
    for (i = 12; i <= 28; i += 4)   s [i] = '\'';
-   for (i =  9; i <= 28; i += 4)   s [i] = LTRS_UPLOW  [rand () % strlen (LTRS_UPLOW )];
+   for (i =  9; i <= 28; i += 4)   s [i] = YSTR_UPLOW  [rand () % strlen (YSTR_UPLOW )];
    /*---(center)-------------------------*/
    for (i = 29; i <= 35; ++i)      s [i] = x_fill      [rand () % strlen (x_fill     )];
    a = (rand () %  4) + ((rand () % 2) ? 'a' : 'A');
@@ -93,16 +93,16 @@ ysec__challenge_65byte   (int a_seed, char *a_challenge)
    a = (rand () %  3) + ((rand () % 2) ? 'x' : 'X');
    s [33 + rand () % 3] = a;
    /*---(right)--------------------------*/
-   for (i = 36; i <= 55; ++i)      s [i] = LTRS_NUMBER [rand () % strlen (LTRS_NUMBER)];
+   for (i = 36; i <= 55; ++i)      s [i] = YSTR_NUMBER [rand () % strlen (YSTR_NUMBER)];
    for (i = 36; i <= 55; i += 4)   s [i] = '\'';
    /*---(suffix/ticks)-------------------*/
-   for (i = 56; i <= 62; ++i)   s [i] = LTRS_TICK [rand () %  strlen (LTRS_TICK)];
-   s [63] = LTRS_BPUNC [rand () % strlen (LTRS_BPUNC)];
-   s [64] = LTRS_UPLOW [rand () % strlen (LTRS_UPLOW)];
+   for (i = 56; i <= 62; ++i)   s [i] = YSTR_TICK [rand () %  strlen (YSTR_TICK)];
+   s [63] = YSTR_BPUNC [rand () % strlen (YSTR_BPUNC)];
+   s [64] = YSTR_UPLOW [rand () % strlen (YSTR_UPLOW)];
    /*---(subtle change)------------------*/
-   s [ 5] = LTRS_UPLOW [rand () % strlen (LTRS_UPLOW )];
-   s [59] = LTRS_UPLOW [rand () % strlen (LTRS_UPLOW )];
-   s [32] = LTRS_FILES [rand () % 64];
+   s [ 5] = YSTR_UPLOW [rand () % strlen (YSTR_UPLOW )];
+   s [59] = YSTR_UPLOW [rand () % strlen (YSTR_UPLOW )];
+   s [32] = YSTR_FILES [rand () % 64];
    /*---(saveback)-----------------------*/
    if (a_challenge != NULL)  strlcpy (a_challenge, s, LEN_LONG);
    s_type = '6';

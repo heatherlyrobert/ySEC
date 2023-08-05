@@ -303,7 +303,7 @@ ySEC_close         (int *a_fd)
       return rce;
    }
    /*---(set standard attributes)--------*/
-   rc = yexec_tty__standard (*a_fd);
+   rc = ysec__standard (*a_fd);
    DEBUG_YEXEC  yLOG_value   ("standard"  , rc);
    --rce;  if (rc < 0) {
       DEBUG_YEXEC  yLOG_exitr   (__FUNCTION__, rce);

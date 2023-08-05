@@ -429,7 +429,7 @@ char       /*----: set up program urgents/debugging --------------------------*/
 ysec__unit_loud        (void)
 {
    yLOGS_begin   ("ySEC" , YLOG_SYS, YLOG_NOISE);
-   yURG_name     ("ysec" , YURG_ON);
+   yURG_by_name  ("ysec" , YURG_ON);
    DEBUG_YEXEC  yLOG_info     ("ySEC"      , ySEC_version   ());
    return 0;
 }
