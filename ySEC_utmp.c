@@ -39,31 +39,31 @@ ysec__file_rename       (char *a_terse, char *a_name)
       /*---(copy)---------------------------*/
       --rce;  switch (a_terse [0]) {
       case 'u' :
-         strlcpy (n_utmp   , F_UTMP   , LEN_FULL);
+         ystrlcpy (n_utmp   , F_UTMP   , LEN_FULL);
          DEBUG_YSEC  yLOG_snote   (n_utmp);
          break;
       case 'w' :
-         strlcpy (n_wtmp   , F_WTMP   , LEN_FULL);
+         ystrlcpy (n_wtmp   , F_WTMP   , LEN_FULL);
          DEBUG_YSEC  yLOG_snote   (n_wtmp);
          break;
       case 'b' :
-         strlcpy (n_btmp   , F_BTMP   , LEN_FULL);
+         ystrlcpy (n_btmp   , F_BTMP   , LEN_FULL);
          DEBUG_YSEC  yLOG_snote   (n_btmp);
          break;
       case 'l' :
-         strlcpy (n_last   , F_LASTLOG, LEN_FULL);
+         ystrlcpy (n_last   , F_LASTLOG, LEN_FULL);
          DEBUG_YSEC  yLOG_snote   (n_last);
          break;
       case 's' :
-         strlcpy (n_sulog  , F_SULOG  , LEN_FULL);
+         ystrlcpy (n_sulog  , F_SULOG  , LEN_FULL);
          DEBUG_YSEC  yLOG_snote   (n_sulog);
          break;
       case 'g' :
-         strlcpy (n_getty  , F_GETTY  , LEN_FULL);
+         ystrlcpy (n_getty  , F_GETTY  , LEN_FULL);
          DEBUG_YSEC  yLOG_snote   (n_getty);
          break;
       case 'h' :
-         strlcpy (n_hestia , F_LOGGING, LEN_FULL);
+         ystrlcpy (n_hestia , F_LOGGING, LEN_FULL);
          DEBUG_YSEC  yLOG_snote   (n_hestia);
          break;
       }
@@ -71,7 +71,7 @@ ysec__file_rename       (char *a_terse, char *a_name)
       return 0;
    }
    DEBUG_YSEC   yLOG_snote   (a_name);
-   strlcpy (x_recd, a_name, LEN_RECD);
+   ystrlcpy (x_recd, a_name, LEN_RECD);
    /*---(check length)-------------------*/
    l = strlen (x_recd);
    DEBUG_YSEC  yLOG_sint     (l);
@@ -89,31 +89,31 @@ ysec__file_rename       (char *a_terse, char *a_name)
    /*---(copy)---------------------------*/
    --rce;  switch (a_terse [0]) {
    case 'u' :
-      strlcpy (n_utmp   , x_recd, LEN_FULL);
+      ystrlcpy (n_utmp   , x_recd, LEN_FULL);
       DEBUG_YSEC  yLOG_snote   (n_utmp);
       break;
    case 'w' :
-      strlcpy (n_wtmp   , x_recd, LEN_FULL);
+      ystrlcpy (n_wtmp   , x_recd, LEN_FULL);
       DEBUG_YSEC  yLOG_snote   (n_wtmp);
       break;
    case 'b' :
-      strlcpy (n_btmp   , x_recd, LEN_FULL);
+      ystrlcpy (n_btmp   , x_recd, LEN_FULL);
       DEBUG_YSEC  yLOG_snote   (n_btmp);
       break;
    case 'l' :
-      strlcpy (n_last   , x_recd, LEN_FULL);
+      ystrlcpy (n_last   , x_recd, LEN_FULL);
       DEBUG_YSEC  yLOG_snote   (n_last);
       break;
    case 's' :
-      strlcpy (n_sulog  , x_recd, LEN_FULL);
+      ystrlcpy (n_sulog  , x_recd, LEN_FULL);
       DEBUG_YSEC  yLOG_snote   (n_sulog);
       break;
    case 'g' :
-      strlcpy (n_getty  , x_recd, LEN_FULL);
+      ystrlcpy (n_getty  , x_recd, LEN_FULL);
       DEBUG_YSEC  yLOG_snote   (n_getty);
       break;
    case 'h' :
-      strlcpy (n_hestia , x_recd, LEN_FULL);
+      ystrlcpy (n_hestia , x_recd, LEN_FULL);
       DEBUG_YSEC  yLOG_snote   (n_hestia);
       break;
    }
@@ -169,9 +169,9 @@ ysec__utmp_read    (char w, char n, char *a_recd)
    sprintf (a_recd, "n/a");
    /*---(check file existance)-----------*/
    --rce;  switch (w) {
-   case 'u' :  strlcpy (r, n_utmp   , LEN_FULL);   break;
-   case 'w' :  strlcpy (r, n_wtmp   , LEN_FULL);   break;
-   case 'b' :  strlcpy (r, n_btmp   , LEN_FULL);   break;
+   case 'u' :  ystrlcpy (r, n_utmp   , LEN_FULL);   break;
+   case 'w' :  ystrlcpy (r, n_wtmp   , LEN_FULL);   break;
+   case 'b' :  ystrlcpy (r, n_btmp   , LEN_FULL);   break;
    default  :  return rce;
    }
    f  = fopen (r, "rb");
@@ -212,9 +212,9 @@ ysec__utmp_write   (char w, char *a_dev, char a_type, int a_pid, int a_sid, char
    char        id          [5];
    /*---(check file existance)-----------*/
    --rce;  switch (w) {
-   case 'u' :  strlcpy (r, n_utmp   , LEN_FULL);   break;
-   case 'w' :  strlcpy (r, n_wtmp   , LEN_FULL);   break;
-   case 'b' :  strlcpy (r, n_btmp   , LEN_FULL);   break;
+   case 'u' :  ystrlcpy (r, n_utmp   , LEN_FULL);   break;
+   case 'w' :  ystrlcpy (r, n_wtmp   , LEN_FULL);   break;
+   case 'b' :  ystrlcpy (r, n_btmp   , LEN_FULL);   break;
    default  :  return rce;
    }
    rc = access (r, W_OK);
@@ -456,37 +456,37 @@ ysec_utmp__unit         (char *a_question, char w, int n)
    /*---(simple)-------------------------*/
    if      (strcmp (a_question, "file"      )     == 0) {
       switch (w) {
-      case 'u' :  strlcpy (r, n_utmp   , LEN_FULL);   break;
-      case 'w' :  strlcpy (r, n_wtmp   , LEN_FULL);   break;
-      case 'b' :  strlcpy (r, n_btmp   , LEN_FULL);   break;
-      case 'l' :  strlcpy (r, n_last   , LEN_FULL);   break;
-      case 's' :  strlcpy (r, n_sulog  , LEN_FULL);   break;
-      case 'g' :  strlcpy (r, n_getty  , LEN_FULL);   break;
-      case 'h' :  strlcpy (r, n_hestia , LEN_FULL);   break;
+      case 'u' :  ystrlcpy (r, n_utmp   , LEN_FULL);   break;
+      case 'w' :  ystrlcpy (r, n_wtmp   , LEN_FULL);   break;
+      case 'b' :  ystrlcpy (r, n_btmp   , LEN_FULL);   break;
+      case 'l' :  ystrlcpy (r, n_last   , LEN_FULL);   break;
+      case 's' :  ystrlcpy (r, n_sulog  , LEN_FULL);   break;
+      case 'g' :  ystrlcpy (r, n_getty  , LEN_FULL);   break;
+      case 'h' :  ystrlcpy (r, n_hestia , LEN_FULL);   break;
       }
       snprintf (unit_answer, LEN_RECD, "UTMP %c file      : %2d[%s]", w, strlen (r), r);
    }
    else if (strcmp (a_question, "entry"     )     == 0) {
       switch (w) {
       case 'u' :
-         strlcpy (r, n_utmp   , LEN_FULL);
+         ystrlcpy (r, n_utmp   , LEN_FULL);
          c = ysec__utmp_read (w, n, x_recd);
          break;
       case 'w' :
-         strlcpy (r, n_wtmp   , LEN_FULL);
+         ystrlcpy (r, n_wtmp   , LEN_FULL);
          c = ysec__utmp_read (w, n, x_recd);
          break;
       case 'b' :
-         strlcpy (r, n_btmp   , LEN_FULL);
+         ystrlcpy (r, n_btmp   , LEN_FULL);
          c = ysec__utmp_read (w, n, x_recd);
          break;
       case 'l' :
-         strlcpy (r, n_last   , LEN_FULL);
+         ystrlcpy (r, n_last   , LEN_FULL);
          c = ysec__last_read (n, x_recd);
          break;
-      case 's' :  strlcpy (r, n_sulog  , LEN_FULL);   break;
-      case 'g' :  strlcpy (r, n_getty  , LEN_FULL);   break;
-      case 'h' :  strlcpy (r, n_hestia , LEN_FULL);   break;
+      case 's' :  ystrlcpy (r, n_sulog  , LEN_FULL);   break;
+      case 'g' :  ystrlcpy (r, n_getty  , LEN_FULL);   break;
+      case 'h' :  ystrlcpy (r, n_hestia , LEN_FULL);   break;
       }
       if (n > 99)  n = 99;
       snprintf (unit_answer, LEN_RECD, "UTMP %c recd (%2d) : %3d  %s", w, n, c, x_recd);

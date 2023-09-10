@@ -337,7 +337,7 @@ ySEC_close         (int *a_fd)
  *>    /+---(header)-------------------------+/                                       <* 
  *>    DEBUG_USER   yLOG_enter   (__FUNCTION__);                                      <* 
  *>    /+---(default)------------------------+/                                       <* 
- *>    if (a_true != NULL)  strlcpy (a_true, "", LEN_LABEL);                          <* 
+ *>    if (a_true != NULL)  ystrlcpy (a_true, "", LEN_LABEL);                          <* 
  *>    /+---(defense)------------------------+/                                       <* 
  *>    DEBUG_YEXEC  yLOG_point   ("a_user"    , a_user);                              <* 
  *>    --rce;  if (a_user == NULL) {                                                  <* 
@@ -399,7 +399,7 @@ ySEC_close         (int *a_fd)
  *>       return rce;                                                                 <* 
  *>    }                                                                              <* 
  *>    /+---(save back)----------------------+/                                       <* 
- *>    if (a_true != NULL)  strlcpy (a_true, x_user, LEN_LABEL);                      <* 
+ *>    if (a_true != NULL)  ystrlcpy (a_true, x_user, LEN_LABEL);                      <* 
  *>    /+---(complete)-----------------------+/                                       <* 
  *>    DEBUG_USER   yLOG_exit    (__FUNCTION__);                                      <* 
  *>    return 0;                                                                      <* 
@@ -481,7 +481,7 @@ ySEC_close         (int *a_fd)
  *>    char        a, b, c, d;                                                                  <* 
  *>    char       *t           = "'+";                                                          <* 
  *>    if (a_seed < 0) {                                                                        <* 
- *>       strlcpy (s, a_challenge, LEN_DESC);                                                   <* 
+ *>       ystrlcpy (s, a_challenge, LEN_DESC);                                                   <* 
  *>       return s;                                                                             <* 
  *>    }                                                                                        <* 
  *>    srand (a_seed);                                                                          <* 
@@ -508,7 +508,7 @@ ySEC_close         (int *a_fd)
  *>    for (i = 28; i <= 35; i += 4)   s [i] = '\'';                                            <* 
  *>    /+> for (i = 36; i <= 41; ++i)      s [i] = (rand () %  2 == 0) ? '\'' : '+';      <+/   <* 
  *>    for (i = 36; i <= 41; ++i)      s [i] = t [rand () %  2];                                <* 
- *>    if (a_challenge != NULL)  strlcpy (a_challenge, s, LEN_DESC);                            <* 
+ *>    if (a_challenge != NULL)  ystrlcpy (a_challenge, s, LEN_DESC);                            <* 
  *>    return s;                                                                                <* 
  *> }                                                                                           <*/
 
@@ -545,7 +545,7 @@ ySEC_close         (int *a_fd)
  *>    if (a_phase     != NULL)  *a_phase     = '-';                                                               <* 
  *>    if (a_judgement != NULL)  *a_judgement = '-';                                                               <* 
  *>    if (a_position  != NULL)  *a_position  = 0;                                                                 <* 
- *>    if (a_user      != NULL)  strlcpy (a_user, "", LEN_LABEL);                                                  <* 
+ *>    if (a_user      != NULL)  ystrlcpy (a_user, "", LEN_LABEL);                                                  <* 
  *>    /+---(initialize globals)-------------+/                                                                    <* 
  *>    s_phase     = '-';                                                                                          <* 
  *>    s_judgement = 'i';                                                                                          <* 
@@ -555,17 +555,17 @@ ySEC_close         (int *a_fd)
  *>    /+---(defense)------------------------+/                                                                    <* 
  *>    --rce;  if (a_response  == NULL)  return rce;                                                               <* 
  *>    /+---(preparation)--------------------+/                                                                    <* 
- *>    strlcpy (x_pref, a_response, 7);                                                                            <* 
+ *>    ystrlcpy (x_pref, a_response, 7);                                                                            <* 
  *>    x_len = strlen (x_pref);                                                                                    <* 
  *>    /+---(make sure exact can not match)--+/                                                                    <* 
- *>    strldchg (x_pref, '+' , '-' , LEN_LABEL);                                                                   <* 
- *>    strldchg (x_pref, '\'', '-' , LEN_LABEL);                                                                   <* 
+ *>    ystrldchg (x_pref, '+' , '-' , LEN_LABEL);                                                                   <* 
+ *>    ystrldchg (x_pref, '\'', '-' , LEN_LABEL);                                                                   <* 
  *>    /+---(transform)----------------------+/                                                                    <* 
- *>    strldchg (x_pref, '.' , '+' , LEN_LABEL);                                                                   <* 
- *>    strldchg (x_pref, ' ' , '\'', LEN_LABEL);                                                                   <* 
+ *>    ystrldchg (x_pref, '.' , '+' , LEN_LABEL);                                                                   <* 
+ *>    ystrldchg (x_pref, ' ' , '\'', LEN_LABEL);                                                                   <* 
  *>    /+---(unit testing)-------------------+/                                                                    <* 
- *>    strldchg (x_pref, '¬' , '\'', LEN_LABEL);                                                                   <* 
- *>    strldchg (x_pref, '·' , '\'', LEN_LABEL);                                                                   <* 
+ *>    ystrldchg (x_pref, '¬' , '\'', LEN_LABEL);                                                                   <* 
+ *>    ystrldchg (x_pref, '·' , '\'', LEN_LABEL);                                                                   <* 
  *>    /+---(knock)--------------------------+/                                                                    <* 
  *>    s_phase = 'k';                                                                                              <* 
  *>    UPDATE;                                                                                                     <* 
@@ -594,9 +594,9 @@ ySEC_close         (int *a_fd)
  *>    else if (strchr ("abcd", s [22]) != NULL)  s_rot = s [22] - 'a' + 1;                                        <* 
  *>    else if (strchr ("ABCD", s [23]) != NULL)  s_rot = s [23] - 'A' + 1;                                        <* 
  *>    else if (strchr ("abcd", s [23]) != NULL)  s_rot = s [23] - 'a' + 1;                                        <* 
- *>    c = strldcnt (a_response, '/', LEN_DESC);                                                                   <* 
+ *>    c = ystrldcnt (a_response, '/', LEN_DESC);                                                                   <* 
  *>    --rce;  if (c < 1)        PARTIAL;                                                                          <* 
- *>    strlcpy (t, a_response + 6, LEN_DESC);                                                                      <* 
+ *>    ystrlcpy (t, a_response + 6, LEN_DESC);                                                                      <* 
  *>    p = strtok_r (t, "/", &r);                                                                                  <* 
  *>    UPDATE;                                                                                                     <* 
  *>    --rce;  if (p == NULL)    PARTIAL;                                                                          <* 
@@ -616,7 +616,7 @@ ySEC_close         (int *a_fd)
  *>    /+---(password)-----------------------+/                                                                    <* 
  *>    s_phase = 'c';                                                                                              <* 
  *>    UPDATE;                                                                                                     <* 
- *>    c = strldcnt (a_response, '/', LEN_DESC);                                                                   <* 
+ *>    c = ystrldcnt (a_response, '/', LEN_DESC);                                                                   <* 
  *>    --rce;  if (c < 2)        PARTIAL;                                                                          <* 
  *>    ++p;                                                                                                        <* 
  *>    x_len = strlen (p);                                                                                         <* 
@@ -653,7 +653,7 @@ ySEC_close         (int *a_fd)
  *>    s_judgement = 'Y';                                                                                          <* 
  *>    UPDATE;                                                                                                     <* 
  *>    /+---(save back)----------------------+/                                                                    <* 
- *>    if (a_user != NULL)  strlcpy (a_user, x_user, LEN_LABEL);                                                   <* 
+ *>    if (a_user != NULL)  ystrlcpy (a_user, x_user, LEN_LABEL);                                                   <* 
  *>    /+---(complete)-----------------------+/                                                                    <* 
  *>    return 0;                                                                                                   <* 
  *> }                                                                                                              <*/
@@ -673,7 +673,7 @@ static void      o___UNITTEST________________o (void) {;}
  *>    int         rc          =    0;                                                                                                                           <* 
  *>    char        x_heartbeat [LEN_HUND];                                                                                                                       <* 
  *>    /+---(prepare)------------------------+/                                                                                                                  <* 
- *>    strlcpy  (unit_answer, "TTY              : question not understood", LEN_RECD);                                                                           <* 
+ *>    ystrlcpy  (unit_answer, "TTY              : question not understood", LEN_RECD);                                                                           <* 
  *>    /+---(crontab name)-------------------+/                                                                                                                  <* 
  *>    if      (strcmp (a_question, "response"      )  == 0) {                                                                                                   <* 
  *>       snprintf (unit_answer, LEN_RECD, "TTY response     : phase %c, judge %c, s_rot %d, s_off %d, s_pos %2d", s_phase, s_judgement, s_rot, s_off, s_pos);   <* 

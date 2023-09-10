@@ -154,8 +154,8 @@ ysec__active            (int a_rpid, long a_now, char *a_response, char a_phase,
    if (x_dur <   0)  x_dur = 0;
    if (x_dur > 999)  x_dur = 999;
    /*---(get the stop)-------------------*/
-   if (strlen (a_user) == 0)  strlcpy (t, "-"   , LEN_LABEL);
-   else                       strlcpy (t, a_user, LEN_LABEL);
+   if (strlen (a_user) == 0)  ystrlcpy (t, "-"   , LEN_LABEL);
+   else                       ystrlcpy (t, a_user, LEN_LABEL);
    sprintf (x_salt, "%c%c", x_recd [73], x_recd [128]);
    fseek   (f, x_pos + 151, SEEK_SET);
    fprintf (f, "%-13.13s  %c  %c  %c  %3d  %-12.12s  %3d",
@@ -302,11 +302,11 @@ ysec_new__unit          (char *a_question, char w, int n)
    /*---(simple)-------------------------*/
    if      (strcmp (a_question, "entry"     )     == 0) {
       switch (w) {
-      case 'g' :  strlcpy (r, n_getty  , LEN_FULL);   break;
-      case 'h' :  strlcpy (r, n_hestia , LEN_FULL);   break;
+      case 'g' :  ystrlcpy (r, n_getty  , LEN_FULL);   break;
+      case 'h' :  ystrlcpy (r, n_hestia , LEN_FULL);   break;
       }
       c = yEXEC_file_verify (r, n, x_recd);
-      strldchg (x_recd, '', '§', LEN_RECD);
+      ystrldchg (x_recd, '', '§', LEN_RECD);
       snprintf (unit_answer, LEN_RECD, "BASE %c recd (%2d) : %3d  %3d[%s]", w, n, c, strlen (x_recd), x_recd);
    }
    /*---(complete)-----------------------*/
