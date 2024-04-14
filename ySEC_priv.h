@@ -28,8 +28,8 @@
 
 #define     P_VERMAJOR  "0.-- preproduction building and testing"
 #define     P_VERMINOR  "0.9- advancing and readying for hestia/hearth"
-#define     P_VERNUM    "0.9d"
-#define     P_VERTXT    "fixes due to changed str functions to ¶ystr¶ in ySTR"
+#define     P_VERNUM    "0.9e"
+#define     P_VERTXT    "minor updates to support library changes"
 
 #define     P_PRIORITY  "direct, simple, brief, vigorous, and lucid (h.w. fowler)"
 #define     P_PRINCIPAL "[grow a set] and build your wings on the way down (r. bradbury)"
