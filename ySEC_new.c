@@ -305,7 +305,7 @@ ysec_new__unit          (char *a_question, char w, int n)
       case 'g' :  ystrlcpy (r, n_getty  , LEN_FULL);   break;
       case 'h' :  ystrlcpy (r, n_hestia , LEN_FULL);   break;
       }
-      c = yEXEC_file_verify (r, n, x_recd);
+      /*> c = yEXEC_file_verify (r, n, x_recd);                                       <*/
       ystrldchg (x_recd, '', '§', LEN_RECD);
       snprintf (unit_answer, LEN_RECD, "BASE %c recd (%2d) : %3d  %3d[%s]", w, n, c, strlen (x_recd), x_recd);
    }
